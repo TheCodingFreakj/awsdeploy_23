@@ -1,30 +1,51 @@
 import React from "react";
-import logo from "./logo.svg";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HealthCheck from "./components/healthcheck";
 import "./App.css";
 import axios from "axios";
+
 function App() {
   const [name, setname] = React.useState("");
-  axios
-    .get(`${process.env.REACT_APP_BASE_URL}/api/users`, {})
-    .then(function (response) {
-      console.log(response);
-      setname(response.data[0].name);
-    });
+
+  console.log(process.env);
+  React.useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/users`, {})
+      .then(function (response) {
+        setname(response.data);
+      });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{name}</p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {name}
-        </a>
-      </header>
+      <Router>
+        <div className="App">
+          {name &&
+            name.map((data) => {
+              return (
+                <>
+                  <p>{data.username}</p>
+                  <a
+                    className="App-link"
+                    href="https://reactjs.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {data.username}
+                  </a>
+                </>
+              );
+            })}
+          <Routes>
+            <Route exact path="/" element={<HealthCheck />}></Route>
+            <Route path="/health" element={<HealthCheck />}></Route>
+          </Routes>
+        </div>
+        
+      
+      </Router>
     </div>
+    
   );
 }
 

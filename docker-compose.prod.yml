@@ -9,9 +9,6 @@ services:
     restart: always
     image: "pallavi/sampleproject:production_14062021_api"
 
-    ports:
-      - "4000:4000"
-
   ##############################
   # UI Container
   ##############################
@@ -19,9 +16,6 @@ services:
     image: "pallavi/sampleproject:production_14062021_ui"
     restart: always
     container_name: ui
-    ports:
-      - "80:80"
-      - "443:443"
     depends_on:
       - api
     # volumes:

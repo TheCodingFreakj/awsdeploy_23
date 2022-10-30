@@ -1,10 +1,12 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-var app = express();
-const Router = require("./routes");
+const db = require("./db");
+require("dotenv").config();
+// console.log(process.env);
+const usersRoute = require("./routes/users");
+const app = express();
 app.use(express.json());
-
+//https://dev.to/ryands17/deploy-a-node-app-to-aws-ecs-with-dynamic-port-mapping-38gd
 const corsOpts = {
   origin: "*",
 
@@ -14,24 +16,24 @@ const corsOpts = {
 };
 
 app.use(cors(corsOpts));
-app.use(Router);
-mongoose.connect(
-  "mongodb+srv://root:root@todo.kkypwwy.mongodb.net/?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+app.use((err, req, res, next) => {
+  if (err.statusCode) {
+    res.status(err.statusCode).send(err.message);
+  } else {
+    console.log(err);
+    res.status(500).send("Something unexpected happened");
   }
-);
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error: "));
-db.once("open", function () {
-  console.log("Connected successfully");
 });
+app.get("/health", function (req, res) {
+  res.status(200).send("instance is healthy");
+});
+app.use(usersRoute);
+
 const PORT = process.env.PORT || 3000;
-// app.use(express.static(path.join(__dirname, "../ui/build")));
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, "../ui/build/index.html"));
-// });
-app.listen(PORT, () =>
-  console.log(`Server running at http://localhost:${PORT}`)
-);
+// console.log("deb", db);
+// console.log("process.env", process.env);
+console.log(process.env.NODE_ENV);
+app.listen(PORT, () => {
+  console.log("Server Started");
+});
+
